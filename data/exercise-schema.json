@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "GymChuot Exercise",
+  "description": "Schema cho một bài tập trong GymChuot. Base từ free-exercise-db, mở rộng thêm các field GymChuot-specific.",
+  "type": "object",
+  "required": ["id", "name", "primaryMuscles", "equipment", "category"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique ID dạng snake_case, VD: Bench_Press_Barbell",
+      "example": "Bench_Press_-_Barbell"
+    },
+    "name": {
+      "type": "string",
+      "description": "Tên tiếng Anh (chuẩn quốc tế)",
+      "example": "Bench Press"
+    },
+    "nameVi": {
+      "type": ["string", "null"],
+      "description": "Tên tiếng Việt (do AI dịch + PT review)",
+      "example": "Đẩy ngực Barbell"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["Ngực", "Lưng", "Vai", "Tay", "Chân", "Core", "Cardio", "Olympic", "Powerlifting", "Khởi động / Giãn cơ", "Plyometrics"],
+      "description": "Nhóm bài tập chính"
+    },
+    "equipment": {
+      "type": "string",
+      "enum": ["Barbell", "Dumbbell", "Cable", "Machine", "Bodyweight", "EZ Bar", "Kettlebell", "Resistance Band", "Exercise Ball", "Foam Roller", "Medicine Ball", "Other"],
+      "description": "Thiết bị cần dùng"
+    },
+    "level": {
+      "type": "string",
+      "enum": ["beginner", "intermediate", "expert"],
+      "description": "Độ khó"
+    },
+    "mechanic": {
+      "type": ["string", "null"],
+      "enum": ["compound", "isolation", null],
+      "description": "Đơn khớp hay đa khớp"
+    },
+    "force": {
+      "type": ["string", "null"],
+      "enum": ["push", "pull", "static", null],
+      "description": "Hướng lực"
+    },
+    "primaryMuscles": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Nhóm cơ chính",
+      "example": ["Ngực"]
+    },
+    "secondaryMuscles": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Nhóm cơ phụ",
+      "example": ["Tay sau (Triceps)", "Vai"]
+    },
+    "instructions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Hướng dẫn thực hiện từng bước"
+    },
+    "images": {
+      "type": "array",
+      "items": { "type": "string", "format": "uri" },
+      "description": "URLs ảnh minh họa (từ free-exercise-db CDN)"
+    },
+    "commonMistakes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "[GymChuot] Lỗi phổ biến — PT cộng đồng đóng góp",
+      "example": ["Không kéo vai xuống", "Arch lưng quá nhiều"]
+    },
+    "videoUrl": {
+      "type": ["string", "null"],
+      "format": "uri",
+      "description": "[GymChuot] URL video demo (≤ 25MB hoặc YouTube embed)"
+    },
+    "gymchuotVerified": {
+      "type": "boolean",
+      "description": "[GymChuot] Đã được PT trên nền tảng review và xác nhận",
+      "default": false
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "[GymChuot] Tags tự do để search, VD: [\"mông to\", \"giảm mỡ\", \"bụng 6 múi\"]"
+    }
+  }
+}
