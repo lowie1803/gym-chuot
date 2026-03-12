@@ -17,11 +17,11 @@ npm run data:all      # Both data steps
 ```
 
 ## Key constraints & preferences
-- `src/App.jsx` is intentionally monolithic for the prototype — don't split into pages/components yet
 - `data/exercises.json` is generated, don't edit by hand — re-run the pipeline instead
 - DnD uses native HTML5 API now; migrate to dnd-kit when going to production (touch support)
 - Vietnamese-first: UI labels, exercise names, and error messages should be in Vietnamese
 - Video uploads hard-capped at 25MB (gym clips, not full videos)
+- Plain prop drilling (no Context/Zustand) — max 2-3 levels deep; introduce Context when Supabase replaces local state
 
 ## What's in progress right now
 Phase 1: building auth + Supabase backend to turn prototype into a real product.

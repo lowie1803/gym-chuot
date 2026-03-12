@@ -13,5 +13,14 @@
 | 009 | feature | Progress tracking + charts (student logs → graphs) | low | idea |
 | 010 | feature | PT Dashboard (multi-student overview) | low | idea |
 | 011 | feature | Mobile PWA (responsive + installable) | low | idea |
+| 012 | feature | Refactor App.jsx into components. | high | done |
+| 013 | bug | the header is glitching | low | todo |
 
 ## Inbox
+
+
+> Sigils (no spaces between them): `[type][priority] Title`
+> **Type:** `b` bug · `e` experimental · *(omit)* feature
+> **Priority:** `^` high · `_` low · *(omit)* medium
+> Examples: `- ^Urgent feature` · `- b^Critical bug` · `- e_Risky idea`
+
