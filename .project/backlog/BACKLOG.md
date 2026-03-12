@@ -2,8 +2,6 @@
 
 | ID | Type | Title | Priority | Status |
 |----|------|-------|----------|--------|
-| 001 | feature | Auth — PT vs Student roles (register/login) | high | open |
-| 002 | feature | Backend + DB (Supabase: users, workouts, messages) | high | open |
 | 003 | feature | Real-time messaging (Supabase Realtime) | high | open |
 | 004 | feature | Student Workout Viewer (rest timer, log actual results) | medium | idea |
 | 005 | feature | Workout Templates (save + clone for multiple students) | medium | idea |
@@ -13,9 +11,9 @@
 | 009 | feature | Progress tracking + charts (student logs → graphs) | low | idea |
 | 010 | feature | PT Dashboard (multi-student overview) | low | idea |
 | 011 | feature | Mobile PWA (responsive + installable) | low | idea |
+| 012 | feature | Seeding script for dev environment | high | done |
 
 ## Inbox
-
 
 
 > Sigils (no spaces between them): `[type][priority] Title`

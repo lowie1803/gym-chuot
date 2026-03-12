@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "data:import": "node scripts/import-exercises.js",
     "data:translate": "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY node scripts/translate-vi.js",
-    "data:all": "npm run data:import && npm run data:translate"
+    "data:all": "npm run data:import && npm run data:translate",
+    "db:reset": "npx supabase db reset"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.99.1",
