@@ -8,7 +8,6 @@ export default function WorkoutBuilder({
   exercises, updateExercise, removeExercise, addExercise, reorderExercises,
   selectedStudent, setSelectedStudent,
   sendWorkout,
-  draggingFromLibrary, setDraggingFromLibrary,
 }) {
   const [dragIndex, setDragIndex] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
@@ -23,9 +22,9 @@ export default function WorkoutBuilder({
 
   const handleDrop = (e, dropIndex) => {
     e.preventDefault();
-    if (draggingFromLibrary) {
-      addExercise(draggingFromLibrary);
-      setDraggingFromLibrary(null);
+    const exerciseData = e.dataTransfer.getData('exercise');
+    if (exerciseData) {
+      addExercise(JSON.parse(exerciseData));
       setIsDropZoneActive(false);
       return;
     }
@@ -41,10 +40,10 @@ export default function WorkoutBuilder({
 
   const handleDropZoneDrop = (e) => {
     e.preventDefault();
-    if (draggingFromLibrary) {
-      addExercise(draggingFromLibrary);
+    const exerciseData = e.dataTransfer.getData('exercise');
+    if (exerciseData) {
+      addExercise(JSON.parse(exerciseData));
     }
-    setDraggingFromLibrary(null);
     setIsDropZoneActive(false);
   };
 
@@ -82,7 +81,7 @@ export default function WorkoutBuilder({
       {/* Canvas */}
       <div
         style={{ flex: 1, overflowY: "auto", padding: 20 }}
-        onDragOver={(e) => { e.preventDefault(); if (draggingFromLibrary) setIsDropZoneActive(true); }}
+        onDragOver={(e) => { e.preventDefault(); if (e.dataTransfer.types.includes('exercise')) setIsDropZoneActive(true); }}
         onDragLeave={() => setIsDropZoneActive(false)}
         onDrop={handleDropZoneDrop}
       >

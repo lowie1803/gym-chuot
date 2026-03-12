@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { EXERCISE_LIBRARY, EQUIPMENT_COLOR } from "../../constants";
 
-export default function ExerciseLibrary({ addExercise, setDraggingFromLibrary }) {
+export default function ExerciseLibrary({ addExercise }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("Ngực");
 
@@ -64,8 +64,7 @@ export default function ExerciseLibrary({ addExercise, setDraggingFromLibrary })
               <div
                 key={ex.id}
                 draggable
-                onDragStart={(e) => { setDraggingFromLibrary(ex); e.dataTransfer.effectAllowed = "copy"; }}
-                onDragEnd={() => setDraggingFromLibrary(null)}
+                onDragStart={(e) => { e.dataTransfer.setData('exercise', JSON.stringify(ex)); e.dataTransfer.effectAllowed = "copy"; }}
                 onDoubleClick={() => addExercise(ex)}
                 title="Kéo vào builder hoặc double-click để thêm"
                 style={{

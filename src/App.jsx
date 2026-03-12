@@ -28,7 +28,11 @@ export default function GymChuot() {
   const [messages, setMessages] = useState(SAMPLE_MESSAGES);
   const [workoutSent, setWorkoutSent] = useState(false);
   const [showSentToast, setShowSentToast] = useState(false);
-  const [draggingFromLibrary, setDraggingFromLibrary] = useState(null);
+
+  const handleTabChange = (tab) => {
+    if (tab === "messenger") setWorkoutSent(false);
+    setActiveTab(tab);
+  };
 
   const addExercise = useCallback((ex) => {
     setExercises(prev => [...prev, {
@@ -102,13 +106,12 @@ export default function GymChuot() {
       `}</style>
 
       <div style={{ display: "flex", height: "100vh", fontFamily: "'DM Sans', sans-serif", background: "#0a0a0f", color: "#fff", overflow: "hidden" }}>
-        <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <LeftSidebar activeTab={activeTab} setActiveTab={handleTabChange} />
 
         {activeTab === "builder" && (
           <>
             <ExerciseLibrary
               addExercise={addExercise}
-              setDraggingFromLibrary={setDraggingFromLibrary}
             />
             <WorkoutBuilder
               workoutName={workoutName}
@@ -121,8 +124,6 @@ export default function GymChuot() {
               selectedStudent={selectedStudent}
               setSelectedStudent={setSelectedStudent}
               sendWorkout={sendWorkout}
-              draggingFromLibrary={draggingFromLibrary}
-              setDraggingFromLibrary={setDraggingFromLibrary}
             />
           </>
         )}
@@ -134,7 +135,7 @@ export default function GymChuot() {
             workoutSent={workoutSent}
             messages={messages}
             sendMessage={sendMessage}
-            setActiveTab={setActiveTab}
+            setActiveTab={handleTabChange}
           />
         )}
 
