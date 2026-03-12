@@ -1,14 +1,29 @@
 import { useState, useCallback } from "react";
-import { EXERCISE_LIBRARY, SAMPLE_MESSAGES } from "./constants";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { EXERCISE_LIBRARY } from "./constants";
+import { useAuth } from "./contexts/AuthContext";
+import { useStudents } from "./hooks/useStudents";
+import { useWorkouts } from "./hooks/useWorkouts";
+import { useMessages } from "./hooks/useMessages";
+import { getConversationId } from "./lib/utils";
+import AuthPage from "./components/auth/AuthPage";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import LeftSidebar from "./components/LeftSidebar";
 import Toast from "./components/Toast";
 import Placeholder from "./components/Placeholder";
 import ExerciseLibrary from "./components/builder/ExerciseLibrary";
 import WorkoutBuilder from "./components/builder/WorkoutBuilder";
 import Messenger from "./components/messenger/Messenger";
+import StudentManagement from "./components/students/StudentManagement";
 
-export default function GymChuot() {
-  const [activeTab, setActiveTab] = useState("builder");
+function GymChuotApp() {
+  const { user, profile, signOut } = useAuth();
+  const { students } = useStudents();
+  const { sendWorkout: sendWorkoutToSupabase, saving } = useWorkouts();
+
+  const [activeTab, setActiveTab] = useState(
+    profile?.role === "student" ? "messenger" : "builder"
+  );
   const [workoutName, setWorkoutName] = useState("Push Day A - Tuần 3");
   const [exercises, setExercises] = useState([
     {
@@ -24,10 +39,14 @@ export default function GymChuot() {
       sets: [{ reps: 10, weight: 50, rest: 90 }, { reps: 8, weight: 55, rest: 90 }]
     },
   ]);
-  const [selectedStudent, setSelectedStudent] = useState("Tuấn Anh");
-  const [messages, setMessages] = useState(SAMPLE_MESSAGES);
+  const [selectedStudentId, setSelectedStudentId] = useState(null);
   const [workoutSent, setWorkoutSent] = useState(false);
   const [showSentToast, setShowSentToast] = useState(false);
+
+  const activeStudents = students.filter((s) => s.status === "active");
+  const selectedStudent = activeStudents.find((s) => s.id === selectedStudentId) || activeStudents[0] || null;
+  const conversationId = selectedStudent ? getConversationId(user.id, selectedStudent.id) : null;
+  const { messages, sendMessage: sendChatMessage } = useMessages(conversationId);
 
   const handleTabChange = (tab) => {
     if (tab === "messenger") setWorkoutSent(false);
@@ -67,84 +86,93 @@ export default function GymChuot() {
     setExercises(reordered);
   }, []);
 
-  const sendWorkout = () => {
-    const workoutMsg = {
-      id: Date.now(), from: "pt", name: "Coach Minh", avatar: "🏆",
-      time: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
-      type: "workout",
-      workoutData: { name: workoutName, exercises: exercises.map(e => ({ name: e.name, icon: e.icon, sets: e.sets })) }
-    };
-    setMessages(prev => [...prev, workoutMsg]);
-    setWorkoutSent(true);
-    setShowSentToast(true);
-    setTimeout(() => setShowSentToast(false), 3000);
-    setTimeout(() => setActiveTab("messenger"), 400);
+  const sendWorkout = async () => {
+    if (!selectedStudent) return;
+
+    const { error } = await sendWorkoutToSupabase({
+      name: workoutName,
+      exercises: exercises.map(e => ({ name: e.name, icon: e.icon, sets: e.sets })),
+      receiverId: selectedStudent.id,
+    });
+
+    if (!error) {
+      setWorkoutSent(true);
+      setShowSentToast(true);
+      setTimeout(() => setShowSentToast(false), 3000);
+      setTimeout(() => setActiveTab("messenger"), 400);
+    }
   };
 
-  const sendMessage = (text) => {
-    setMessages(prev => [...prev, {
-      id: Date.now(), from: "pt", name: "Coach Minh", avatar: "🏆",
-      text,
-      time: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })
-    }]);
+  const sendMessage = async (text) => {
+    if (!selectedStudent) return;
+    await sendChatMessage({ text, receiverId: selectedStudent.id });
   };
+
+  const selectedStudentName = selectedStudent?.full_name || "";
 
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #0a0a0f; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-        input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
-        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
-        @keyframes toastIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-      `}</style>
+    <div style={{ display: "flex", height: "100vh", fontFamily: "'DM Sans', sans-serif", background: "#0a0a0f", color: "#fff", overflow: "hidden" }}>
+      <LeftSidebar
+        activeTab={activeTab}
+        setActiveTab={handleTabChange}
+        role={profile?.role}
+        onSignOut={signOut}
+      />
 
-      <div style={{ display: "flex", height: "100vh", fontFamily: "'DM Sans', sans-serif", background: "#0a0a0f", color: "#fff", overflow: "hidden" }}>
-        <LeftSidebar activeTab={activeTab} setActiveTab={handleTabChange} />
-
-        {activeTab === "builder" && (
-          <>
-            <ExerciseLibrary
-              addExercise={addExercise}
-            />
-            <WorkoutBuilder
-              workoutName={workoutName}
-              setWorkoutName={setWorkoutName}
-              exercises={exercises}
-              updateExercise={updateExercise}
-              removeExercise={removeExercise}
-              addExercise={addExercise}
-              reorderExercises={reorderExercises}
-              selectedStudent={selectedStudent}
-              setSelectedStudent={setSelectedStudent}
-              sendWorkout={sendWorkout}
-            />
-          </>
-        )}
-
-        {activeTab === "messenger" && (
-          <Messenger
-            selectedStudent={selectedStudent}
-            setSelectedStudent={setSelectedStudent}
-            workoutSent={workoutSent}
-            messages={messages}
-            sendMessage={sendMessage}
-            setActiveTab={handleTabChange}
+      {activeTab === "builder" && profile?.role === "pt" && (
+        <>
+          <ExerciseLibrary addExercise={addExercise} />
+          <WorkoutBuilder
+            workoutName={workoutName}
+            setWorkoutName={setWorkoutName}
+            exercises={exercises}
+            updateExercise={updateExercise}
+            removeExercise={removeExercise}
+            addExercise={addExercise}
+            reorderExercises={reorderExercises}
+            selectedStudent={selectedStudentName}
+            setSelectedStudent={(id) => setSelectedStudentId(id)}
+            sendWorkout={sendWorkout}
+            students={activeStudents}
+            saving={saving}
           />
-        )}
+        </>
+      )}
 
-        {(activeTab === "students" || activeTab === "analytics") && (
-          <Placeholder tab={activeTab} />
-        )}
-      </div>
+      {activeTab === "messenger" && (
+        <Messenger
+          selectedStudent={selectedStudent}
+          setSelectedStudent={(s) => setSelectedStudentId(s?.id || s)}
+          workoutSent={workoutSent}
+          messages={messages}
+          sendMessage={sendMessage}
+          setActiveTab={handleTabChange}
+          students={activeStudents}
+          currentUserId={user.id}
+        />
+      )}
 
-      <Toast show={showSentToast} workoutName={workoutName} studentName={selectedStudent} />
-    </>
+      {activeTab === "students" && <StudentManagement />}
+
+      {activeTab === "analytics" && <Placeholder tab="analytics" />}
+
+      <Toast show={showSentToast} workoutName={workoutName} studentName={selectedStudentName} />
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/auth" element={<AuthPage />} />
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute>
+            <GymChuotApp />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   );
 }

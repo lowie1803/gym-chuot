@@ -38,10 +38,3 @@ export const EQUIPMENT_COLOR = {
   Bodyweight: "#34D399",
 };
 
-export const SAMPLE_STUDENTS = ["Tuấn Anh", "Minh Khoa", "Thu Hà", "Bảo Long"];
-
-export const SAMPLE_MESSAGES = [
-  { id: 1, from: "pt", name: "Coach Minh", avatar: "🏆", text: "Chào Tuấn! Hôm nay tao gửi mày bài Push Day mới 💪", time: "09:00" },
-  { id: 2, from: "student", name: "Tuấn", avatar: "🧑", text: "Ngon! Anh, lần trước bài ngực em vẫn còn đau 😅", time: "09:02" },
-  { id: 3, from: "pt", name: "Coach Minh", avatar: "🏆", text: "Bình thường, cơ đang phục hồi. Hôm nay giảm volume xuống:", time: "09:03", workout: true },
-];

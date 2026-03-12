@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { SAMPLE_STUDENTS } from "../../constants";
 import ExerciseCard from "./ExerciseCard";
 import WorkoutSummaryCard from "./WorkoutSummaryCard";
 
@@ -7,7 +6,7 @@ export default function WorkoutBuilder({
   workoutName, setWorkoutName,
   exercises, updateExercise, removeExercise, addExercise, reorderExercises,
   selectedStudent, setSelectedStudent,
-  sendWorkout,
+  sendWorkout, students = [], saving = false,
 }) {
   const [dragIndex, setDragIndex] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
@@ -63,17 +62,19 @@ export default function WorkoutBuilder({
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <select
-            value={selectedStudent}
+            value={selectedStudent || ""}
             onChange={e => setSelectedStudent(e.target.value)}
             style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", color: "#fff", borderRadius: 8, padding: "8px 12px", fontSize: 13, outline: "none", cursor: "pointer" }}
           >
-            {SAMPLE_STUDENTS.map(s => <option key={s} style={{ background: "#1a1a2e" }}>{s}</option>)}
+            {students.length === 0 && <option style={{ background: "#1a1a2e" }}>Chưa có học viên</option>}
+            {students.map(s => <option key={s.id} value={s.id} style={{ background: "#1a1a2e" }}>{s.full_name}</option>)}
           </select>
           <button
             onClick={sendWorkout}
-            style={{ background: "linear-gradient(135deg, #00d4ff, #0070ff)", border: "none", color: "#fff", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 1, boxShadow: "0 4px 20px rgba(0,212,255,0.3)" }}
+            disabled={saving || students.length === 0}
+            style={{ background: "linear-gradient(135deg, #00d4ff, #0070ff)", border: "none", color: "#fff", borderRadius: 8, padding: "8px 18px", fontSize: 13, fontWeight: 700, cursor: saving ? "wait" : "pointer", display: "flex", alignItems: "center", gap: 6, fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 1, boxShadow: "0 4px 20px rgba(0,212,255,0.3)", opacity: saving ? 0.7 : 1 }}
           >
-            📤 GỬI BÀI TẬP
+            {saving ? "⏳ ĐANG GỬI..." : "📤 GỬI BÀI TẬP"}
           </button>
         </div>
       </div>

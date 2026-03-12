@@ -12,8 +12,10 @@
     "data:all": "npm run data:import && npm run data:translate"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.99.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^7.13.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.0.0",
