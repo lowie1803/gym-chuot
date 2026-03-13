@@ -1,10 +1,11 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { EXERCISE_LIBRARY } from "./constants";
 import { useAuth } from "./contexts/AuthContext";
 import { useStudents } from "./hooks/useStudents";
 import { useWorkouts } from "./hooks/useWorkouts";
 import { useMessages } from "./hooks/useMessages";
+import { useConversationPreviews } from "./hooks/useConversationPreviews";
 import { getConversationId } from "./lib/utils";
 import AuthPage from "./components/auth/AuthPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -40,7 +41,6 @@ function GymChuotApp() {
     },
   ]);
   const [selectedStudentId, setSelectedStudentId] = useState(null);
-  const [workoutSent, setWorkoutSent] = useState(false);
   const [showSentToast, setShowSentToast] = useState(false);
 
   const activeStudents = students.filter((s) => s.status === "active");
@@ -48,8 +48,17 @@ function GymChuotApp() {
   const conversationId = selectedStudent ? getConversationId(user.id, selectedStudent.id) : null;
   const { messages, sendMessage: sendChatMessage } = useMessages(conversationId);
 
+  const conversationIds = useMemo(
+    () => activeStudents.map((s) => getConversationId(user.id, s.id)),
+    [activeStudents.map((s) => s.id).join(","), user.id]
+  );
+  const { previews, markAsRead } = useConversationPreviews(conversationIds, conversationId);
+
+  useEffect(() => {
+    if (conversationId) markAsRead(conversationId);
+  }, [conversationId, markAsRead]);
+
   const handleTabChange = (tab) => {
-    if (tab === "messenger") setWorkoutSent(false);
     setActiveTab(tab);
   };
 
@@ -96,7 +105,6 @@ function GymChuotApp() {
     });
 
     if (!error) {
-      setWorkoutSent(true);
       setShowSentToast(true);
       setTimeout(() => setShowSentToast(false), 3000);
       setTimeout(() => setActiveTab("messenger"), 400);
@@ -143,7 +151,7 @@ function GymChuotApp() {
         <Messenger
           selectedStudent={selectedStudent}
           setSelectedStudent={(s) => setSelectedStudentId(s?.id || s)}
-          workoutSent={workoutSent}
+          previews={previews}
           messages={messages}
           sendMessage={sendMessage}
           setActiveTab={handleTabChange}

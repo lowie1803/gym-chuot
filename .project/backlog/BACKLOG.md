@@ -11,7 +11,8 @@
 | 009 | feature | Progress tracking + charts (student logs → graphs) | low | idea |
 | 010 | feature | PT Dashboard (multi-student overview) | low | idea |
 | 011 | feature | Mobile PWA (responsive + installable) | low | idea |
-| 012 | feature | Seeding script for dev environment | high | done |
+| 012 | feature | Redesign drag and drop features: the exercises should be squared & make it easier to look. | high | todo |
+| 013 | feature | Crawl data from free-exercise-db | high | todo |
 
 ## Inbox
 

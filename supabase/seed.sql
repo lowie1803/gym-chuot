@@ -277,3 +277,10 @@ INSERT INTO public.messages (conversation_id, sender_id, receiver_id, type, text
     NULL,
     now() - interval '1 hour 15 minutes'
   );
+
+------------------------------------------------------------------------
+-- 6. Conversation reads (mark seeded messages as read)
+------------------------------------------------------------------------
+INSERT INTO public.conversation_reads (user_id, conversation_id, last_read_at) VALUES
+  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001_00000000-0000-0000-0000-000000000011', now()),
+  ('00000000-0000-0000-0000-000000000011', '00000000-0000-0000-0000-000000000001_00000000-0000-0000-0000-000000000011', now());
