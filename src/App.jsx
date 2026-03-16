@@ -1,12 +1,11 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { EXERCISE_LIBRARY } from "./constants";
 import { useAuth } from "./contexts/AuthContext";
 import { useStudents } from "./hooks/useStudents";
 import { useWorkouts } from "./hooks/useWorkouts";
 import { useMessages } from "./hooks/useMessages";
 import { useConversationPreviews } from "./hooks/useConversationPreviews";
-import { useExercises } from "./hooks/useExercises";
+import { useExercises, findExerciseByName } from "./hooks/useExercises";
 import { getConversationId } from "./lib/utils";
 import AuthPage from "./components/auth/AuthPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -29,17 +28,17 @@ function GymChuotApp() {
     profile?.role === "student" ? "messenger" : "builder"
   );
   const [workoutName, setWorkoutName] = useState("Push Day A - Tuần 3");
-  const [exercises, setExercises] = useState([
+  const [exercises, setExercises] = useState(() => [
     {
-      id: "ex1", ...EXERCISE_LIBRARY["Ngực"][0],
+      id: "ex1", ...findExerciseByName("Barbell Bench Press - Medium Grip"),
       sets: [{ reps: 8, weight: 80, rest: 90 }, { reps: 8, weight: 80, rest: 90 }, { reps: 6, weight: 85, rest: 120 }]
     },
     {
-      id: "ex2", ...EXERCISE_LIBRARY["Ngực"][1],
+      id: "ex2", ...findExerciseByName("Incline Dumbbell Press"),
       sets: [{ reps: 10, weight: 20, rest: 75 }, { reps: 10, weight: 20, rest: 75 }, { reps: 8, weight: 22, rest: 90 }]
     },
     {
-      id: "ex3", ...EXERCISE_LIBRARY["Vai & Tay"][0],
+      id: "ex3", ...findExerciseByName("Standing Military Press"),
       sets: [{ reps: 10, weight: 50, rest: 90 }, { reps: 8, weight: 55, rest: 90 }]
     },
   ]);
@@ -81,6 +80,9 @@ function GymChuotApp() {
         sets.push({ ...sets[sets.length - 1] });
       } else if (field === "_remove") {
         sets.splice(setIdx, 1);
+      } else if (field === "_bulkUpdate") {
+        const { field: f, value: v } = value;
+        ex.sets = sets.map(s => ({ ...s, [f]: v }));
       } else {
         sets[setIdx] = { ...sets[setIdx], [field]: value };
       }

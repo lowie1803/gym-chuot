@@ -9,7 +9,7 @@ const MUSCLE_GROUPS = {
   "Core": ["Bụng", "Cổ"],
 };
 
-const CATEGORIES = Object.keys(MUSCLE_GROUPS);
+const CATEGORIES = ["Tất cả", ...Object.keys(MUSCLE_GROUPS)];
 
 function muscleToCategory(primaryMuscles) {
   for (const muscle of primaryMuscles) {
@@ -30,6 +30,10 @@ export function useExercises() {
   return { exercises: mappedExercises, categories: CATEGORIES, loading: false };
 }
 
+export function findExerciseByName(name) {
+  return mappedExercises.find((e) => e.name === name);
+}
+
 export function useExerciseSearch(exercises, categories) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState(categories[0] || "Ngực");
@@ -44,6 +48,7 @@ export function useExerciseSearch(exercises, categories) {
           e.muscle.toLowerCase().includes(q)
       );
     }
+    if (activeCategory === "Tất cả") return exercises;
     return exercises.filter((e) => e.categoryGroup === activeCategory);
   }, [exercises, searchQuery, activeCategory]);
 

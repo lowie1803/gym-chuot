@@ -15,3 +15,9 @@
 | 002 | feature | Backend + DB (Supabase: users, workouts, messages) | high | done |
 | 012 | feature | Seeding script for dev environment | high | done |
 | 003 | feature | Real-time messaging (Supabase Realtime) | high | done |
+| 008 | feature | Migrate DnD from native HTML5 to dnd-kit (touch support) | medium | done |
+| 012 | feature | Redesign drag and drop features: the exercises should be squared & make it easier to look. | high | done |
+| 014 | feature | Load real images from the database to the card | med | done |
+| 015 | feature | Exercise weight is optional | med | done |
+| 016 | feature | Add "All" filters to the library to display everything at once | med | done |
+| 017 | feature | Bulk set config — apply reps/weight/rest to all sets at once | med | done |

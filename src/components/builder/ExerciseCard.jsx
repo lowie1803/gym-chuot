@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { EQUIPMENT_COLOR } from "../../constants";
+import { CATEGORY_EMOJI, EQUIPMENT_COLOR } from "../../constants";
 import SetInput from "./SetInput";
 
 export default function ExerciseCard({ exercise, index, onUpdate, onRemove }) {
   const [expanded, setExpanded] = useState(true);
+  const [imgStatus, setImgStatus] = useState("loading");
+  const hasImage = exercise.images?.length > 0;
+  const showWeight = exercise.equipment !== "Bodyweight";
   const {
     attributes,
     listeners,
@@ -54,9 +57,40 @@ export default function ExerciseCard({ exercise, index, onUpdate, onRemove }) {
         >
           ⋮⋮
         </span>
-        <span style={{ fontSize: 20, width: 32, textAlign: "center" }}>
-          {exercise.icon}
-        </span>
+        <div
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: 6,
+            overflow: "hidden",
+            flexShrink: 0,
+            background: "rgba(255,255,255,0.06)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {hasImage && imgStatus !== "error" ? (
+            <img
+              src={exercise.images[0]}
+              alt={exercise.name}
+              loading="lazy"
+              onLoad={() => setImgStatus("loaded")}
+              onError={() => setImgStatus("error")}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                display: imgStatus === "loading" ? "none" : "block",
+              }}
+            />
+          ) : null}
+          {(!hasImage || imgStatus === "error" || imgStatus === "loading") && (
+            <span style={{ fontSize: 20 }}>
+              {exercise.icon || CATEGORY_EMOJI[exercise.muscle] || "💪"}
+            </span>
+          )}
+        </div>
         <div style={{ flex: 1 }}>
           <div
             style={{
@@ -124,6 +158,55 @@ export default function ExerciseCard({ exercise, index, onUpdate, onRemove }) {
 
       {expanded && (
         <div style={{ padding: "0 14px 14px" }}>
+          {/* Bulk row — applies to all sets */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              marginBottom: 6,
+              paddingBottom: 6,
+              borderBottom: "1px dashed rgba(255,255,255,0.1)",
+              background: "rgba(255,255,255,0.02)",
+              borderRadius: "6px 6px 0 0",
+              padding: "6px 4px",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 11,
+                color: "rgba(0,212,255,0.6)",
+                width: 40,
+                fontFamily: "monospace",
+                fontWeight: 700,
+              }}
+            >
+              Tất cả
+            </div>
+            <SetInput
+              label="Reps"
+              value={exercise.sets[0]?.reps ?? ""}
+              unit="lần"
+              onChange={(v) => onUpdate(index, -1, "_bulkUpdate", { field: "reps", value: v })}
+              color="#00d4ff"
+            />
+            {showWeight && (
+              <SetInput
+                label="Weight"
+                value={exercise.sets[0]?.weight ?? ""}
+                unit="kg"
+                onChange={(v) => onUpdate(index, -1, "_bulkUpdate", { field: "weight", value: v })}
+                color="#FF6B35"
+              />
+            )}
+            <SetInput
+              label="Rest"
+              value={exercise.sets[0]?.rest ?? ""}
+              unit="s"
+              onChange={(v) => onUpdate(index, -1, "_bulkUpdate", { field: "rest", value: v })}
+              color="#34D399"
+            />
+          </div>
           {exercise.sets.map((set, si) => (
             <div
               key={si}
@@ -151,13 +234,15 @@ export default function ExerciseCard({ exercise, index, onUpdate, onRemove }) {
                 onChange={(v) => onUpdate(index, si, "reps", v)}
                 color="#00d4ff"
               />
-              <SetInput
-                label="Weight"
-                value={set.weight}
-                unit="kg"
-                onChange={(v) => onUpdate(index, si, "weight", v)}
-                color="#FF6B35"
-              />
+              {showWeight && (
+                <SetInput
+                  label="Weight"
+                  value={set.weight}
+                  unit="kg"
+                  onChange={(v) => onUpdate(index, si, "weight", v)}
+                  color="#FF6B35"
+                />
+              )}
               <SetInput
                 label="Rest"
                 value={set.rest}
@@ -222,7 +307,31 @@ export function ExerciseCardOverlay({ exercise }) {
         gap: 10,
       }}
     >
-      <span style={{ fontSize: 20 }}>{exercise.icon}</span>
+      <div
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: 6,
+          overflow: "hidden",
+          flexShrink: 0,
+          background: "rgba(255,255,255,0.06)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {exercise.images?.length > 0 ? (
+          <img
+            src={exercise.images[0]}
+            alt={exercise.name}
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        ) : (
+          <span style={{ fontSize: 20 }}>
+            {exercise.icon || CATEGORY_EMOJI[exercise.muscle] || "💪"}
+          </span>
+        )}
+      </div>
       <div>
         <div
           style={{

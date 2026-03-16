@@ -96,7 +96,7 @@ function transformExercise(raw) {
     instructions: raw.instructions || [],
     images: (raw.images || []).map(
       (img) =>
-        `https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/${raw.id}/${img}`
+        `https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/${img}`
     ),
     // GymChuot-specific fields (to be filled by PT community)
     commonMistakes: [],
