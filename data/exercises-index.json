@@ -1,0 +1,48 @@
+{
+  "total": 873,
+  "byCategory": {
+    "strength": 581,
+    "Khởi động / Giãn cơ": 123,
+    "Plyometrics": 61,
+    "Strongman": 21,
+    "Powerlifting": 38,
+    "Cardio": 14,
+    "Olympic": 35
+  },
+  "byEquipment": {
+    "Bodyweight": 111,
+    "Machine": 67,
+    "Other": 199,
+    "Foam Roller": 11,
+    "Kettlebell": 53,
+    "Dumbbell": 123,
+    "Cable": 81,
+    "Barbell": 170,
+    "Resistance Band": 20,
+    "Medicine Ball": 17,
+    "Exercise Ball": 12,
+    "EZ Bar": 9
+  },
+  "muscles": [
+    "Bắp chân",
+    "Bụng",
+    "Cẳng tay",
+    "Cổ",
+    "Dạng đùi",
+    "Khép đùi",
+    "Lưng dưới",
+    "Lưng giữa",
+    "Lưng rộng",
+    "Mông",
+    "Ngực",
+    "Tay sau (Triceps)",
+    "Tay trước (Biceps)",
+    "Thang lưng",
+    "Vai",
+    "Đùi sau",
+    "Đùi trước"
+  ],
+  "lastUpdated": "2026-03-16T01:43:13.583Z",
+  "source": "https://github.com/yuhonas/free-exercise-db",
+  "license": "Public Domain"
+}

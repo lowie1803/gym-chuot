@@ -14,3 +14,4 @@
 | 001 | feature | Auth — PT vs Student roles (register/login) | high | done |
 | 002 | feature | Backend + DB (Supabase: users, workouts, messages) | high | done |
 | 012 | feature | Seeding script for dev environment | high | done |
+| 003 | feature | Real-time messaging (Supabase Realtime) | high | done |

@@ -6,12 +6,14 @@ import { useStudents } from "./hooks/useStudents";
 import { useWorkouts } from "./hooks/useWorkouts";
 import { useMessages } from "./hooks/useMessages";
 import { useConversationPreviews } from "./hooks/useConversationPreviews";
+import { useExercises } from "./hooks/useExercises";
 import { getConversationId } from "./lib/utils";
 import AuthPage from "./components/auth/AuthPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import LeftSidebar from "./components/LeftSidebar";
 import Toast from "./components/Toast";
 import Placeholder from "./components/Placeholder";
+import BuilderDndWrapper from "./components/builder/BuilderDndWrapper";
 import ExerciseLibrary from "./components/builder/ExerciseLibrary";
 import WorkoutBuilder from "./components/builder/WorkoutBuilder";
 import Messenger from "./components/messenger/Messenger";
@@ -21,6 +23,7 @@ function GymChuotApp() {
   const { user, profile, signOut } = useAuth();
   const { students } = useStudents();
   const { sendWorkout: sendWorkoutToSupabase, saving } = useWorkouts();
+  const { exercises: exerciseLibrary, categories } = useExercises();
 
   const [activeTab, setActiveTab] = useState(
     profile?.role === "student" ? "messenger" : "builder"
@@ -128,23 +131,29 @@ function GymChuotApp() {
       />
 
       {activeTab === "builder" && profile?.role === "pt" && (
-        <>
-          <ExerciseLibrary addExercise={addExercise} />
+        <BuilderDndWrapper
+          exercises={exercises}
+          addExercise={addExercise}
+          reorderExercises={reorderExercises}
+        >
+          <ExerciseLibrary
+            exercises={exerciseLibrary}
+            categories={categories}
+            addExercise={addExercise}
+          />
           <WorkoutBuilder
             workoutName={workoutName}
             setWorkoutName={setWorkoutName}
             exercises={exercises}
             updateExercise={updateExercise}
             removeExercise={removeExercise}
-            addExercise={addExercise}
-            reorderExercises={reorderExercises}
             selectedStudent={selectedStudentName}
             setSelectedStudent={(id) => setSelectedStudentId(id)}
             sendWorkout={sendWorkout}
             students={activeStudents}
             saving={saving}
           />
-        </>
+        </BuilderDndWrapper>
       )}
 
       {activeTab === "messenger" && (

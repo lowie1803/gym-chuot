@@ -30,6 +30,27 @@ export const EXERCISE_LIBRARY = {
   ],
 };
 
+export const CATEGORY_EMOJI = {
+  "Ngực": "🏋️",
+  "Lưng rộng": "🔝",
+  "Lưng giữa": "🚣",
+  "Lưng dưới": "🏗️",
+  "Vai": "🎯",
+  "Đùi trước": "🦵",
+  "Đùi sau": "🦵",
+  "Mông": "🍑",
+  "Bắp chân": "👟",
+  "Tay trước (Biceps)": "💪",
+  "Tay sau (Triceps)": "🔻",
+  "Bụng": "🌀",
+  "Core": "📐",
+  "Cẳng tay": "✊",
+  "Thang lưng": "🔺",
+  "Dạng đùi": "↔️",
+  "Khép đùi": "↕️",
+  "Cổ": "🔄",
+};
+
 export const EQUIPMENT_COLOR = {
   Barbell: "#FF6B35",
   Dumbbell: "#4ECDC4",

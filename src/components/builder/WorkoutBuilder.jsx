@@ -1,50 +1,21 @@
-import { useState } from "react";
+import { useMemo } from "react";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { useDroppable } from "@dnd-kit/core";
 import ExerciseCard from "./ExerciseCard";
 import WorkoutSummaryCard from "./WorkoutSummaryCard";
 
 export default function WorkoutBuilder({
   workoutName, setWorkoutName,
-  exercises, updateExercise, removeExercise, addExercise, reorderExercises,
+  exercises, updateExercise, removeExercise,
   selectedStudent, setSelectedStudent,
   sendWorkout, students = [], saving = false,
 }) {
-  const [dragIndex, setDragIndex] = useState(null);
-  const [dragOverIndex, setDragOverIndex] = useState(null);
-  const [isDropZoneActive, setIsDropZoneActive] = useState(false);
+  const { setNodeRef, isOver } = useDroppable({ id: "builder-canvas" });
 
-  const handleDragStart = (e, index) => {
-    setDragIndex(index);
-    e.dataTransfer.effectAllowed = "move";
-  };
-
-  const handleDragOver = (index) => setDragOverIndex(index);
-
-  const handleDrop = (e, dropIndex) => {
-    e.preventDefault();
-    const exerciseData = e.dataTransfer.getData('exercise');
-    if (exerciseData) {
-      addExercise(JSON.parse(exerciseData));
-      setIsDropZoneActive(false);
-      return;
-    }
-    if (dragIndex === null || dragIndex === dropIndex) {
-      setDragIndex(null); setDragOverIndex(null); return;
-    }
-    const updated = [...exercises];
-    const [moved] = updated.splice(dragIndex, 1);
-    updated.splice(dropIndex, 0, moved);
-    reorderExercises(updated);
-    setDragIndex(null); setDragOverIndex(null);
-  };
-
-  const handleDropZoneDrop = (e) => {
-    e.preventDefault();
-    const exerciseData = e.dataTransfer.getData('exercise');
-    if (exerciseData) {
-      addExercise(JSON.parse(exerciseData));
-    }
-    setIsDropZoneActive(false);
-  };
+  const sortableItems = useMemo(
+    () => exercises.map((e) => "builder-" + e.id),
+    [exercises]
+  );
 
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
@@ -80,27 +51,27 @@ export default function WorkoutBuilder({
       </div>
 
       {/* Canvas */}
-      <div
-        style={{ flex: 1, overflowY: "auto", padding: 20 }}
-        onDragOver={(e) => { e.preventDefault(); if (e.dataTransfer.types.includes('exercise')) setIsDropZoneActive(true); }}
-        onDragLeave={() => setIsDropZoneActive(false)}
-        onDrop={handleDropZoneDrop}
-      >
+      <div ref={setNodeRef} style={{ flex: 1, overflowY: "auto", padding: 20 }}>
         <WorkoutSummaryCard exercises={exercises} />
 
         {exercises.length === 0 ? (
-          <div style={{ border: "2px dashed rgba(0,212,255,0.2)", borderRadius: 16, padding: "60px 20px", textAlign: "center", color: "rgba(255,255,255,0.25)", animation: "pulse 2s infinite", background: isDropZoneActive ? "rgba(0,212,255,0.05)" : "transparent", transition: "all 0.2s" }}>
+          <div style={{
+            border: `2px dashed ${isOver ? "rgba(0,212,255,0.5)" : "rgba(0,212,255,0.2)"}`,
+            borderRadius: 16,
+            padding: "60px 20px",
+            textAlign: "center",
+            color: "rgba(255,255,255,0.25)",
+            background: isOver ? "rgba(0,212,255,0.08)" : "transparent",
+            transition: "all 0.2s",
+          }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>💪</div>
-            <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 20, fontWeight: 700, marginBottom: 6 }}>Kéo bài tập vào đây</div>
+            <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 20, fontWeight: 700, marginBottom: 6 }}>
+              {isOver ? "Thả bài tập vào đây!" : "Kéo bài tập vào đây"}
+            </div>
             <div style={{ fontSize: 13 }}>hoặc double-click bài tập trong thư viện</div>
           </div>
         ) : (
-          <>
-            {isDropZoneActive && exercises.length > 0 && (
-              <div style={{ border: "2px dashed rgba(0,212,255,0.4)", borderRadius: 12, padding: "14px", textAlign: "center", color: "#00d4ff", marginBottom: 8, background: "rgba(0,212,255,0.05)", fontSize: 13, fontWeight: 600 }}>
-                ↓ Thả vào đây để thêm xuống cuối
-              </div>
-            )}
+          <SortableContext items={sortableItems} strategy={verticalListSortingStrategy}>
             {exercises.map((ex, i) => (
               <ExerciseCard
                 key={ex.id}
@@ -108,13 +79,9 @@ export default function WorkoutBuilder({
                 index={i}
                 onUpdate={updateExercise}
                 onRemove={removeExercise}
-                isDragging={dragIndex === i}
-                onDragStart={handleDragStart}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
               />
             ))}
-          </>
+          </SortableContext>
         )}
       </div>
     </div>
