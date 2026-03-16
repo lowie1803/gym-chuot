@@ -9,6 +9,7 @@ export default function WorkoutBuilder({
   exercises, updateExercise, removeExercise,
   selectedStudent, setSelectedStudent,
   sendWorkout, students = [], saving = false,
+  onSaveAsTemplate, onShowTemplates, templateCount = 0,
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: "builder-canvas" });
 
@@ -40,6 +41,24 @@ export default function WorkoutBuilder({
             {students.length === 0 && <option style={{ background: "#1a1a2e" }}>Chưa có học viên</option>}
             {students.map(s => <option key={s.id} value={s.id} style={{ background: "#1a1a2e" }}>{s.full_name}</option>)}
           </select>
+          <button
+            onClick={onShowTemplates}
+            style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.6)", borderRadius: 8, padding: "8px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 0.5, position: "relative" }}
+          >
+            📋 MẪU
+            {templateCount > 0 && (
+              <span style={{ position: "absolute", top: -6, right: -6, background: "#00d4ff", color: "#000", borderRadius: "50%", width: 18, height: 18, fontSize: 10, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {templateCount}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={onSaveAsTemplate}
+            disabled={exercises.length === 0}
+            style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.6)", borderRadius: 8, padding: "8px 14px", fontSize: 12, fontWeight: 700, cursor: exercises.length === 0 ? "not-allowed" : "pointer", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 0.5, opacity: exercises.length === 0 ? 0.4 : 1 }}
+          >
+            💾 LƯU MẪU
+          </button>
           <button
             onClick={sendWorkout}
             disabled={saving || students.length === 0}

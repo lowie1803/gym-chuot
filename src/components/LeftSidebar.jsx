@@ -2,7 +2,7 @@ const PT_TABS = [
   { id: "builder", icon: "📋", label: "Builder" },
   { id: "messenger", icon: "💬", label: "Tin nhắn" },
   { id: "students", icon: "👥", label: "Học viên" },
-  { id: "analytics", icon: "📊", label: "Thống kê" },
+  { id: "dashboard", icon: "📊", label: "Tổng quan" },
 ];
 
 const STUDENT_TABS = [

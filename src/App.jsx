@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import { useStudents } from "./hooks/useStudents";
 import { useWorkouts } from "./hooks/useWorkouts";
+import { useDashboard } from "./hooks/useDashboard";
 import { useMessages } from "./hooks/useMessages";
 import { useConversationPreviews } from "./hooks/useConversationPreviews";
 import { useExercises, findExerciseByName } from "./hooks/useExercises";
@@ -11,17 +12,19 @@ import AuthPage from "./components/auth/AuthPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import LeftSidebar from "./components/LeftSidebar";
 import Toast from "./components/Toast";
-import Placeholder from "./components/Placeholder";
 import BuilderDndWrapper from "./components/builder/BuilderDndWrapper";
 import ExerciseLibrary from "./components/builder/ExerciseLibrary";
 import WorkoutBuilder from "./components/builder/WorkoutBuilder";
+import TemplatePanel from "./components/builder/TemplatePanel";
 import Messenger from "./components/messenger/Messenger";
 import StudentManagement from "./components/students/StudentManagement";
+import PTDashboard from "./components/dashboard/PTDashboard";
 
 function GymChuotApp() {
   const { user, profile, signOut } = useAuth();
   const { students } = useStudents();
-  const { sendWorkout: sendWorkoutToSupabase, saving } = useWorkouts();
+  const { sendWorkout: sendWorkoutToSupabase, saving, saveAsTemplate, fetchTemplates, deleteTemplate, templates, loadWorkout } = useWorkouts();
+  const { recentWorkouts, loading: dashboardLoading } = useDashboard();
   const { exercises: exerciseLibrary, categories } = useExercises();
 
   const [activeTab, setActiveTab] = useState(
@@ -44,6 +47,7 @@ function GymChuotApp() {
   ]);
   const [selectedStudentId, setSelectedStudentId] = useState(null);
   const [showSentToast, setShowSentToast] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
 
   const activeStudents = students.filter((s) => s.status === "active");
   const selectedStudent = activeStudents.find((s) => s.id === selectedStudentId) || activeStudents[0] || null;
@@ -59,6 +63,10 @@ function GymChuotApp() {
   useEffect(() => {
     if (conversationId) markAsRead(conversationId);
   }, [conversationId, markAsRead]);
+
+  useEffect(() => {
+    if (profile?.role === "pt") fetchTemplates();
+  }, [profile?.role]);
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -99,6 +107,42 @@ function GymChuotApp() {
   const reorderExercises = useCallback((reordered) => {
     setExercises(reordered);
   }, []);
+
+  const handleSaveAsTemplate = async () => {
+    if (exercises.length === 0) return;
+    const { error } = await saveAsTemplate({
+      name: workoutName,
+      exercises: exercises.map(e => ({ name: e.name, icon: e.icon, sets: e.sets })),
+    });
+    if (!error) {
+      fetchTemplates();
+      setShowSentToast(true);
+      setTimeout(() => setShowSentToast(false), 3000);
+    }
+  };
+
+  const handleLoadTemplate = async (workoutId) => {
+    const workout = await loadWorkout(workoutId);
+    if (workout) {
+      setWorkoutName(workout.name);
+      setExercises(
+        (workout.workout_exercises || [])
+          .sort((a, b) => a.order_index - b.order_index)
+          .map((e, i) => ({
+            id: `ex_${Date.now()}_${i}`,
+            name: e.exercise_name,
+            icon: e.exercise_icon,
+            sets: e.sets || [],
+          }))
+      );
+      setShowTemplates(false);
+    }
+  };
+
+  const handleDeleteTemplate = async (workoutId) => {
+    const { error } = await deleteTemplate(workoutId);
+    if (!error) fetchTemplates();
+  };
 
   const sendWorkout = async () => {
     if (!selectedStudent) return;
@@ -154,7 +198,18 @@ function GymChuotApp() {
             sendWorkout={sendWorkout}
             students={activeStudents}
             saving={saving}
+            onSaveAsTemplate={handleSaveAsTemplate}
+            onShowTemplates={() => setShowTemplates(prev => !prev)}
+            templateCount={templates.length}
           />
+          {showTemplates && (
+            <TemplatePanel
+              templates={templates}
+              onLoad={handleLoadTemplate}
+              onDelete={handleDeleteTemplate}
+              onClose={() => setShowTemplates(false)}
+            />
+          )}
         </BuilderDndWrapper>
       )}
 
@@ -173,7 +228,14 @@ function GymChuotApp() {
 
       {activeTab === "students" && <StudentManagement />}
 
-      {activeTab === "analytics" && <Placeholder tab="analytics" />}
+      {activeTab === "dashboard" && profile?.role === "pt" && (
+        <PTDashboard
+          students={activeStudents}
+          recentWorkouts={recentWorkouts}
+          loading={dashboardLoading}
+          onNavigateToStudent={(id) => { setSelectedStudentId(id); setActiveTab("messenger"); }}
+        />
+      )}
 
       <Toast show={showSentToast} workoutName={workoutName} studentName={selectedStudentName} />
     </div>

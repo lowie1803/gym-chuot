@@ -21,3 +21,9 @@
 | 015 | feature | Exercise weight is optional | med | done |
 | 016 | feature | Add "All" filters to the library to display everything at once | med | done |
 | 017 | feature | Bulk set config — apply reps/weight/rest to all sets at once | med | done |
+| 014 | feature | Load real images from the database to the card | med | done |
+| 015 | feature | Exercise weight is optional | med | done |
+| 016 | feature | Add "All" filters to the library to display everything at once | med | done |
+| 017 | feature | PT shouldn't have to config "Reps", "Weight", "Rest" set-by-set. They should have something to specify for all 3 sets of the same exercise. | med | done |
+| 005 | feature | Workout Templates (save + clone for multiple students) | medium | done |
+| 010 | feature | PT Dashboard (multi-student overview) | low | done |
